@@ -2,81 +2,140 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
   <title>Ticket de Venta</title>
   <style>
+    /* =============================================
+       RESET Y CONFIGURACIÓN BASE
+    ============================================= */
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+      color-adjust: exact;
     }
     
+    /* =============================================
+       CONFIGURACIÓN DE PÁGINA (@page)
+       CRÍTICO: Fuerza el tamaño del papel térmico
+    ============================================= */
+    @page {
+      size: 80mm auto; /* Ancho fijo 80mm, alto automático */
+      margin: 0; /* SIN márgenes */
+      padding: 0;
+    }
+    
+    /* Variante para 58mm - descomentar si usas rollos de 58mm */
+    /*
+    @page {
+      size: 58mm auto;
+      margin: 0;
+      padding: 0;
+    }
+    */
+    
+    /* =============================================
+       ESTILOS DE PANTALLA (Vista previa)
+    ============================================= */
     body {
-      font-family: 'Courier New', monospace;
-      padding: 20px;
-      background: #f5f5f5;
+      font-family: 'Courier New', 'Consolas', monospace;
+      background: #f0f0f0;
+      padding: 10px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
     
     .ticket {
-      width: 80mm;
+      width: 80mm; /* Ancho del ticket - ajustar a 58mm si es necesario */
       max-width: 100%;
       background: white;
-      padding: 10mm;
-      margin: 0 auto;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-    
-    .header {
-      text-align: center;
-      margin-bottom: 15px;
-      border-bottom: 2px dashed #000;
-      padding-bottom: 10px;
-    }
-    
-    .logo {
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      margin-bottom: 10px;
-    }
-    
-    .empresa-nombre {
-      font-size: 18px;
-      font-weight: bold;
-      margin: 5px 0;
-    }
-    
-    .empresa-info {
-      font-size: 11px;
+      padding: 5mm;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      margin: 0 auto 20px;
+      font-size: 10pt; /* Tamaño base de fuente */
       line-height: 1.4;
     }
     
+    /* Para rollos de 58mm, usa estos valores:
+    .ticket {
+      width: 58mm;
+      padding: 3mm;
+      font-size: 9pt;
+    }
+    */
+    
+    /* =============================================
+       SECCIONES DEL TICKET
+    ============================================= */
+    .header {
+      text-align: center;
+      margin-bottom: 8px;
+      border-bottom: 1px dashed #000;
+      padding-bottom: 8px;
+    }
+    
+    .logo {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      margin: 0 auto 8px;
+      display: block;
+    }
+    
+    .empresa-nombre {
+      font-size: 14pt;
+      font-weight: bold;
+      margin: 4px 0;
+      text-transform: uppercase;
+    }
+    
+    .empresa-info {
+      font-size: 9pt;
+      line-height: 1.3;
+    }
+    
     .factura-info {
-      margin: 15px 0;
-      font-size: 12px;
+      margin: 8px 0;
+      font-size: 9pt;
+    }
+    
+    .factura-info div {
+      margin: 3px 0;
+      display: flex;
+      justify-content: space-between;
     }
     
     .factura-info strong {
-      display: inline-block;
-      width: 80px;
+      min-width: 70px;
     }
     
+    /* =============================================
+       TABLA DE PRODUCTOS
+    ============================================= */
     table {
       width: 100%;
       border-collapse: collapse;
-      margin: 15px 0;
-      font-size: 11px;
+      margin: 8px 0;
+      font-size: 9pt;
     }
     
     th {
       border-bottom: 1px solid #000;
-      padding: 5px 0;
+      padding: 4px 2px;
       text-align: left;
+      font-weight: bold;
     }
     
     td {
-      padding: 8px 0;
+      padding: 6px 2px;
       border-bottom: 1px dashed #ccc;
+      vertical-align: top;
     }
     
     .text-right {
@@ -87,85 +146,193 @@
       text-align: center;
     }
     
+    /* Columna de producto más ancha */
+    td:first-child {
+      width: 50%;
+    }
+    
+    /* =============================================
+       SECCIÓN DE TOTALES
+    ============================================= */
     .total-section {
-      margin-top: 15px;
-      padding-top: 10px;
-      border-top: 2px solid #000;
-      font-size: 14px;
-      font-weight: bold;
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid #000;
+      font-size: 10pt;
     }
     
     .total-row {
       display: flex;
       justify-content: space-between;
-      margin: 5px 0;
+      margin: 4px 0;
     }
     
+    .total-row.main {
+      font-size: 12pt;
+      font-weight: bold;
+      border-top: 1px solid #000;
+      padding-top: 4px;
+      margin-top: 4px;
+    }
+    
+    /* =============================================
+       PIE DE PÁGINA
+    ============================================= */
     .footer {
       text-align: center;
-      margin-top: 20px;
-      padding-top: 10px;
-      border-top: 2px dashed #000;
-      font-size: 11px;
+      margin-top: 10px;
+      padding-top: 8px;
+      border-top: 1px dashed #000;
+      font-size: 8pt;
     }
     
+    .footer p {
+      margin: 3px 0;
+    }
+    
+    /* =============================================
+       BOTONES (Solo visibles en pantalla)
+    ============================================= */
     .btn-container {
       text-align: center;
-      margin-top: 20px;
-      display: none;
+      margin: 20px 0;
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
     }
     
     .btn {
-      padding: 12px 30px;
-      margin: 0 5px;
+      padding: 12px 24px;
       border: none;
-      border-radius: 5px;
+      border-radius: 8px;
       font-size: 14px;
-      cursor: pointer;
       font-weight: bold;
+      cursor: pointer;
+      transition: transform 0.2s;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+    }
+    
+    .btn:active {
+      transform: scale(0.95);
     }
     
     .btn-print {
-      background: #667eea;
+      background: #4CAF50;
+      color: white;
+    }
+    
+    .btn-rawbt {
+      background: #2196F3;
       color: white;
     }
     
     .btn-close {
-      background: #e53e3e;
+      background: #f44336;
       color: white;
     }
     
+    /* =============================================
+       MEDIA QUERY PARA IMPRESIÓN
+       CRÍTICO: Estas reglas se aplican al imprimir
+    ============================================= */
     @media print {
+      /* Fondo blanco puro, sin padding externo */
       body {
         background: white;
         padding: 0;
-      }
-      
-      .ticket {
-        box-shadow: none;
         margin: 0;
-        padding: 5mm;
+        width: 80mm; /* o 58mm según tu impresora */
       }
       
+      /* Ticket ocupa todo el ancho */
+      .ticket {
+        width: 80mm; /* o 58mm */
+        max-width: 80mm;
+        margin: 0;
+        padding: 3mm;
+        box-shadow: none;
+        page-break-after: avoid;
+      }
+      
+      /* Ocultar botones al imprimir */
       .btn-container {
         display: none !important;
       }
+      
+      /* Evitar saltos de página dentro del ticket */
+      .ticket, .header, .factura-info, table, .total-section, .footer {
+        page-break-inside: avoid;
+      }
+      
+      /* Asegurar que las líneas de borde se impriman */
+      .header, .footer {
+        border-color: #000 !important;
+      }
+      
+      th, td {
+        border-color: #000 !important;
+      }
+      
+      /* Fuentes optimizadas para impresión térmica */
+      body, .ticket {
+        font-size: 9pt;
+        line-height: 1.3;
+      }
+      
+      .empresa-nombre {
+        font-size: 12pt;
+      }
+      
+      /* Forzar impresión de bordes y fondos */
+      * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        color-adjust: exact !important;
+      }
     }
     
-    @media (max-width: 480px) {
+    /* =============================================
+       RESPONSIVE PARA MÓVILES PEQUEÑOS
+    ============================================= */
+    @media screen and (max-width: 400px) {
       .ticket {
         width: 100%;
-        padding: 15px;
+        padding: 8px;
       }
       
       .btn-container {
-        display: block !important;
+        width: 100%;
+        padding: 0 10px;
+      }
+      
+      .btn {
+        flex: 1;
+        min-width: 100px;
+      }
+    }
+    
+    /* =============================================
+       ESTILOS ESPECÍFICOS PARA iOS (Thermer)
+    ============================================= */
+    @supports (-webkit-touch-callout: none) {
+      /* Detecta Safari/iOS */
+      .ticket {
+        -webkit-text-size-adjust: 100%;
+      }
+      
+      @media print {
+        body {
+          -webkit-print-color-adjust: exact;
+        }
       }
     }
   </style>
 </head>
 <body>
+  <!-- CONTENEDOR DEL TICKET -->
   <div class="ticket" id="ticket">
+    <!-- ENCABEZADO -->
     <div class="header">
       <img id="logo" class="logo" src="" alt="Logo" style="display:none">
       <div class="empresa-nombre" id="empresaNombre"></div>
@@ -176,58 +343,112 @@
       </div>
     </div>
     
+    <!-- INFORMACIÓN DE LA FACTURA -->
     <div class="factura-info">
-      <div><strong>Factura:</strong> <span id="numeroFactura"></span></div>
-      <div><strong>Fecha:</strong> <span id="fecha"></span></div>
-      <div><strong>Cliente:</strong> <span id="cliente"></span></div>
+      <div><strong>Factura:</strong><span id="numeroFactura"></span></div>
+      <div><strong>Fecha:</strong><span id="fecha"></span></div>
+      <div><strong>Cliente:</strong><span id="cliente"></span></div>
     </div>
     
+    <!-- TABLA DE PRODUCTOS -->
     <table>
       <thead>
         <tr>
           <th>Producto</th>
           <th class="text-center">Cant</th>
-          <th class="text-right">Subtotal</th>
+          <th class="text-right">Total</th>
         </tr>
       </thead>
       <tbody id="productosBody"></tbody>
     </table>
     
+    <!-- TOTALES -->
     <div class="total-section">
-      <div class="total-row">
+      <div class="total-row main">
         <span>TOTAL:</span>
         <span id="total"></span>
       </div>
-      <div class="total-row" style="font-size:12px;font-weight:normal">
+      <div class="total-row">
         <span>Recibido:</span>
         <span id="recibido"></span>
       </div>
-      <div class="total-row" style="font-size:12px;font-weight:normal">
+      <div class="total-row">
         <span>Devuelta:</span>
         <span id="devuelta"></span>
       </div>
-      <div class="total-row" style="font-size:12px;font-weight:normal">
+      <div class="total-row">
         <span>Método:</span>
         <span id="metodoPago"></span>
       </div>
     </div>
     
+    <!-- PIE DE PÁGINA -->
     <div class="footer">
-      <p>¡Muchas gracias por su compra!</p>
-      <p style="margin-top:5px">Vuelva pronto</p>
+      <p><strong>¡Muchas gracias por su compra!</strong></p>
+      <p>Vuelva pronto</p>
     </div>
   </div>
   
+  <!-- BOTONES DE ACCIÓN (Solo visibles en pantalla) -->
   <div class="btn-container">
-    <button class="btn btn-print" onclick="window.print()">🖨️ Imprimir</button>
-    <button class="btn btn-close" onclick="window.close()">✖️ Cerrar</button>
+    <button class="btn btn-print" onclick="imprimirNormal()">
+      🖨️ Imprimir
+    </button>
+    <button class="btn btn-rawbt" onclick="imprimirRawBT()" id="btnRawBT" style="display:none">
+      📱 RawBT
+    </button>
+    <button class="btn btn-close" onclick="cerrarVentana()">
+      ✖️ Cerrar
+    </button>
   </div>
   
+  <!-- JAVASCRIPT -->
   <script>
+    // =============================================
+    // CONFIGURACIÓN
+    // =============================================
+    const CONFIG = {
+      ANCHO_PAPEL: 80, // Cambiar a 58 si usas rollos de 58mm
+      AUTO_PRINT_DESKTOP: true, // Auto-imprimir en desktop
+      AUTO_PRINT_DELAY: 800, // Delay antes de auto-imprimir (ms)
+      AUTO_CLOSE_AFTER_PRINT: true, // Cerrar ventana después de imprimir
+      AUTO_CLOSE_DELAY: 2000 // Delay antes de cerrar (ms)
+    };
+    
+    // =============================================
+    // UTILIDADES
+    // =============================================
     function formatNumber(num) {
       return new Intl.NumberFormat('es-CO').format(num);
     }
     
+    function esAndroid() {
+      return /Android/i.test(navigator.userAgent);
+    }
+    
+    function esIOS() {
+      return /iPhone|iPad|iPod/i.test(navigator.userAgent);
+    }
+    
+    function esMovil() {
+      return esAndroid() || esIOS();
+    }
+    
+    function esDesktop() {
+      return !esMovil();
+    }
+    
+    // =============================================
+    // DETECCIÓN DE RAWBT (ANDROID)
+    // =============================================
+    function rawBTDisponible() {
+      // RawBT usa el esquema rawbt:// en Android
+      return esAndroid();
+    }
+    
+    // =============================================
+    // FUNCIÓN PRINCIPAL: CARGAR TICKET
+    // =============================================
     function cargarTicket() {
       try {
         // Obtener parámetro 'data' de la URL
@@ -235,7 +456,7 @@
         const dataEncoded = urlParams.get('data');
         
         if (!dataEncoded) {
-          document.body.innerHTML = '<div style="text-align:center;padding:50px;font-family:Arial"><h2>⚠️ Error</h2><p>No se encontraron datos del ticket</p></div>';
+          mostrarError('No se encontraron datos del ticket');
           return;
         }
         
@@ -253,6 +474,9 @@
           const logoImg = document.getElementById('logo');
           logoImg.src = dataDecoded.empresa.logo;
           logoImg.style.display = 'block';
+          logoImg.onerror = function() {
+            this.style.display = 'none'; // Ocultar si falla la carga
+          };
         }
         
         // Información de la factura
@@ -278,23 +502,188 @@
         document.getElementById('devuelta').textContent = '$' + formatNumber(dataDecoded.devuelta);
         document.getElementById('metodoPago').textContent = dataDecoded.metodoPago;
         
-        // Auto-imprimir en desktop después de 500ms
-        if (window.matchMedia('(min-width: 768px)').matches) {
+        // Mostrar botón RawBT si está en Android
+        if (rawBTDisponible()) {
+          document.getElementById('btnRawBT').style.display = 'inline-block';
+        }
+        
+        // Auto-imprimir en desktop
+        if (esDesktop() && CONFIG.AUTO_PRINT_DESKTOP) {
           setTimeout(() => {
             window.print();
-            // Auto-cerrar después de imprimir (opcional)
-            setTimeout(() => window.close(), 1000);
-          }, 500);
+            
+            // Auto-cerrar después de imprimir
+            if (CONFIG.AUTO_CLOSE_AFTER_PRINT) {
+              setTimeout(() => {
+                window.close();
+              }, CONFIG.AUTO_CLOSE_DELAY);
+            }
+          }, CONFIG.AUTO_PRINT_DELAY);
         }
         
       } catch (error) {
         console.error('Error cargando ticket:', error);
-        document.body.innerHTML = '<div style="text-align:center;padding:50px;font-family:Arial"><h2>⚠️ Error</h2><p>Error al cargar los datos del ticket</p><p style="color:#999;font-size:12px">' + error.message + '</p></div>';
+        mostrarError('Error al cargar los datos del ticket', error.message);
       }
     }
     
-    // Ejecutar al cargar la página
+    // =============================================
+    // FUNCIÓN: IMPRIMIR NORMAL (DIÁLOGO DEL NAVEGADOR)
+    // =============================================
+    function imprimirNormal() {
+      window.print();
+    }
+    
+    // =============================================
+    // FUNCIÓN: IMPRIMIR CON RAWBT (ANDROID)
+    // =============================================
+    function imprimirRawBT() {
+      try {
+        // Generar contenido en texto plano para RawBT
+        const contenidoTexto = generarTicketTexto();
+        
+        // Codificar para URL
+        const contenidoCodificado = encodeURIComponent(contenidoTexto);
+        
+        // Construir URL de RawBT
+        // Formato: rawbt:base64:[datos en base64]
+        // O más simple: rawbt:[texto plano]
+        const urlRawBT = 'rawbt:' + contenidoCodificado;
+        
+        console.log('Intentando abrir RawBT...');
+        
+        // Intentar abrir RawBT
+        window.location.href = urlRawBT;
+        
+        // Mensaje de confirmación
+        setTimeout(() => {
+          alert('Si RawBT no se abrió automáticamente, asegúrate de tenerlo instalado y configurado.');
+        }, 1000);
+        
+      } catch (error) {
+        console.error('Error con RawBT:', error);
+        alert('Error al intentar imprimir con RawBT: ' + error.message);
+      }
+    }
+    
+    // =============================================
+    // FUNCIÓN: GENERAR TICKET EN TEXTO PLANO (PARA RAWBT)
+    // =============================================
+    function generarTicketTexto() {
+      const empresa = document.getElementById('empresaNombre').textContent;
+      const nit = document.getElementById('empresaNit').textContent;
+      const direccion = document.getElementById('empresaDireccion').textContent;
+      const telefono = document.getElementById('empresaTelefono').textContent;
+      const factura = document.getElementById('numeroFactura').textContent;
+      const fecha = document.getElementById('fecha').textContent;
+      const cliente = document.getElementById('cliente').textContent;
+      const total = document.getElementById('total').textContent;
+      const recibido = document.getElementById('recibido').textContent;
+      const devuelta = document.getElementById('devuelta').textContent;
+      const metodo = document.getElementById('metodoPago').textContent;
+      
+      // Obtener productos
+      let productosTexto = '';
+      const filas = document.querySelectorAll('#productosBody tr');
+      filas.forEach(fila => {
+        const celdas = fila.querySelectorAll('td');
+        if (celdas.length === 3) {
+          const nombre = celdas[0].textContent;
+          const cantidad = celdas[1].textContent;
+          const subtotal = celdas[2].textContent;
+          productosTexto += `${nombre}\n  ${cantidad} x ${subtotal}\n`;
+        }
+      });
+      
+      // Construir ticket en texto
+      const ancho = CONFIG.ANCHO_PAPEL === 58 ? 32 : 42; // Caracteres por línea
+      const linea = '='.repeat(ancho);
+      const lineaPunteada = '-'.repeat(ancho);
+      
+      let ticket = '';
+      ticket += centrarTexto(empresa, ancho) + '\n';
+      ticket += centrarTexto(nit, ancho) + '\n';
+      ticket += centrarTexto(direccion, ancho) + '\n';
+      ticket += centrarTexto(telefono, ancho) + '\n';
+      ticket += linea + '\n';
+      ticket += `Factura: ${factura}\n`;
+      ticket += `Fecha: ${fecha}\n`;
+      ticket += `Cliente: ${cliente}\n`;
+      ticket += lineaPunteada + '\n';
+      ticket += productosTexto;
+      ticket += linea + '\n';
+      ticket += justificarTexto('TOTAL:', total, ancho) + '\n';
+      ticket += justificarTexto('Recibido:', recibido, ancho) + '\n';
+      ticket += justificarTexto('Devuelta:', devuelta, ancho) + '\n';
+      ticket += justificarTexto('Método:', metodo, ancho) + '\n';
+      ticket += linea + '\n';
+      ticket += centrarTexto('¡Muchas gracias por su compra!', ancho) + '\n';
+      ticket += centrarTexto('Vuelva pronto', ancho) + '\n';
+      ticket += '\n\n\n'; // Líneas en blanco para corte
+      
+      return ticket;
+    }
+    
+    // Utilidad: Centrar texto
+    function centrarTexto(texto, ancho) {
+      const padding = Math.floor((ancho - texto.length) / 2);
+      return ' '.repeat(Math.max(0, padding)) + texto;
+    }
+    
+    // Utilidad: Justificar texto (izquierda y derecha)
+    function justificarTexto(izquierda, derecha, ancho) {
+      const espacios = ancho - izquierda.length - derecha.length;
+      return izquierda + ' '.repeat(Math.max(1, espacios)) + derecha;
+    }
+    
+    // =============================================
+    // FUNCIÓN: CERRAR VENTANA
+    // =============================================
+    function cerrarVentana() {
+      window.close();
+      
+      // Si no se pudo cerrar (depende del navegador)
+      setTimeout(() => {
+        if (!window.closed) {
+          alert('Cierra esta pestaña manualmente');
+        }
+      }, 500);
+    }
+    
+    // =============================================
+    // FUNCIÓN: MOSTRAR ERROR
+    // =============================================
+    function mostrarError(mensaje, detalle = '') {
+      document.body.innerHTML = `
+        <div style="text-align:center; padding:50px; font-family:Arial, sans-serif">
+          <h2 style="color:#f44336">⚠️ Error</h2>
+          <p style="font-size:16px; margin:20px 0">${mensaje}</p>
+          ${detalle ? `<p style="color:#999; font-size:12px; margin-top:10px">${detalle}</p>` : ''}
+          <button onclick="window.close()" style="margin-top:20px; padding:10px 20px; background:#2196F3; color:white; border:none; border-radius:5px; cursor:pointer">
+            Cerrar
+          </button>
+        </div>
+      `;
+    }
+    
+    // =============================================
+    // EVENTO: EJECUTAR AL CARGAR LA PÁGINA
+    // =============================================
     window.addEventListener('load', cargarTicket);
+    
+    // =============================================
+    // EVENTO: DESPUÉS DE IMPRIMIR (DESKTOP)
+    // =============================================
+    window.addEventListener('afterprint', function() {
+      console.log('Impresión completada o cancelada');
+      
+      // Auto-cerrar si está configurado
+      if (esDesktop() && CONFIG.AUTO_CLOSE_AFTER_PRINT) {
+        setTimeout(() => {
+          window.close();
+        }, CONFIG.AUTO_CLOSE_DELAY);
+      }
+    });
   </script>
 </body>
 </html>
